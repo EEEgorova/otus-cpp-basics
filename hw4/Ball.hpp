@@ -8,7 +8,6 @@ private:
     Velocity _velocity;
     Point _center;
     double _radius;
-    double _mass;
     Color _color;
     bool  _isCollidable;
 

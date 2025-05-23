@@ -73,5 +73,5 @@ double Ball::getRadius() const {
  * эквивалентна объему: PI * radius^3 * 4. / 3.
  */
 double Ball::getMass() const {
-    return _mass;
+    return M_PI * std::pow(_radius, 3) * 4.0 / 3.0;
 }
