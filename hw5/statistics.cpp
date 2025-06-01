@@ -75,13 +75,12 @@ public:
 		m_isEmpty = false;
 		m_sum += next;
 		++m_count;
-		m_mean = m_sum / m_count;
 	}
 
 	double eval() const override {
 		if (m_isEmpty)
 			throw std::logic_error("No data");
-		return m_mean;
+		return m_sum / m_count;
 	}
 
 	const char* name() const override {
@@ -89,7 +88,6 @@ public:
 	}
 
 private:
-	double m_mean = 0;
 	double m_sum = 0;
 	int m_count = 0;
 	bool m_isEmpty = true;
@@ -97,20 +95,18 @@ private:
 
 class StandardDeviation : public IStatistics {
 public:
-	StandardDeviation() {
-	}
+	StandardDeviation() = default;
 
 	void update(double next) override {
 		m_isEmpty = false;
 		m_mean.update(next);
 		m_sq_mean.update(next * next);
-		m_std = std::sqrt(m_sq_mean.eval() - m_mean.eval() * m_mean.eval());
 	}
 
 	double eval() const override {
 		if (m_isEmpty)
 			throw std::logic_error("No data");
-		return m_std;
+		return std::sqrt(m_sq_mean.eval() - m_mean.eval() * m_mean.eval());
 	}
 
 	const char* name() const override {
@@ -118,7 +114,6 @@ public:
 	}
 
 private:
-	double m_std = 0;
 	Mean m_mean;
 	Mean m_sq_mean;
 	bool m_isEmpty = true;
