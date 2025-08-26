@@ -73,7 +73,7 @@ std::vector<char> hack(const std::vector<char> &original,
   for (size_t i = 0; i < threadsSize; ++i) {
       size_t start = maxVal / threadsSize * i;
       size_t finish = (i == threadsSize - 1) ? maxVal: maxVal / threadsSize * (i + 1);
-      threads[i] = std::thread(checkInRange, result, originalCrc32, start, finish);
+      threads[i] = std::thread(checkInRange, std::ref(result), originalCrc32, start, finish);
   }
   for ( auto & t : threads) {
     t.join();
