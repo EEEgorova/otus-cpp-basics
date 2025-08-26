@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include <chrono>
+#include <thread>
 
 const size_t TOPK = 10;
 
@@ -25,7 +26,7 @@ void merge_dict(const std::vector<Counter> & inputs, Counter & out);
 
 void print_topk(std::ostream& stream, const Counter&, const size_t k);
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: topk_words [FILES...]\n";
         return EXIT_FAILURE;
@@ -37,7 +38,7 @@ int main(int argc, char *argv[]) {
     std::vector<int> codeResults(argc - 1);
 
     for (int i = 1; i < argc; ++i) {
-        threads[i] = std::thread(run_count_words, argv[i], &freq_dict[i], &codeResults[i]);
+        threads[i - 1] = std::thread(run_count_words, argv[i], &freq_dict[i - 1], &codeResults[i - 1]);
     }
     
     for (auto& t : threads) {
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]) {
 
     Counter freq_dict_total;
     merge_dict( freq_dict, freq_dict_total);
-    print_topk(std::cout, freq_dict_total, TOPK);
+    print_topk(std::cout, freq_dict_total, std::min(TOPK, freq_dict_total.size()));
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed_ms = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     std::cout << "Elapsed time is " << elapsed_ms.count() << " us\n";
