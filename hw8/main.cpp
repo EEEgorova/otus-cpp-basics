@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <atomic>
 #include <iostream>
 #include <limits>
 #include <vector>
@@ -9,7 +10,7 @@
 #include "IO.hpp"
 
 std::mutex myMutex;
-bool resultReady = false;
+std::atomic_bool resultReady = false;
 
 /// @brief Переписывает последние 4 байта значением value
 void replaceLastFourBytes(std::vector<char> &data, uint32_t value) {
@@ -21,7 +22,12 @@ void checkInRange(std::vector<char> &data,
                   size_t start,
                   size_t finish) {
  
-  std::vector<char> result = data;
+  std::vector<char> result;
+  {                    
+    std::lock_guard<std::mutex> guard(myMutex);
+    result = data;
+  }
+    
   for (size_t i = start; i <= finish; ++i) {
     if (resultReady) return;
 
