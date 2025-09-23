@@ -1,54 +1,15 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 
-
-struct GrepResult {
-	size_t position;
-	int style; // 1-one word; 2-line
-	std::string words;
-
-};
-
-void ProssesLine(const std::string & line, const std::string & pattern, GrepResult & result) {
-	auto startPos = line.find(pattern);
-	if ( startPos != std::string::npos) {
-		result.position = startPos;
-		
-		if (result.style == 1) {
-			
-			size_t pos = startPos;
-			while (pos > 0 && line[pos] != ' ') {
-				pos -= 1;
-			}
-			
-			for (size_t i = pos; i < startPos + pattern.size(); ++i) {
-				result.words.push_back(line[i]);
-
-			}
-			pos = startPos + pattern.size();
-			while (pos > line.size() && line[pos] != ' ') {
-				result.words.push_back(line[pos]);
-				++pos;
-			}
-			
-		}
-		else{
-			result.words = line;
-		}
-	}
-	else {
-		result.position = -1;
-	}
-	return;
-}
+#include "LineProssesing.h"
 
 int main(int argc, const char* argv[]) {
 
-	
 	std::cout << "1 - short phrase, 2 - whole line " << std::endl;
-	int style = 0;
-	std::cin >> style;
+	int code;
+	std::cin >> code;
+
+	Style style = code == 1 ? short_phrase : whole_line;
 
 	std::ifstream input;          
 	input.open(argv[1]);
@@ -61,17 +22,24 @@ int main(int argc, const char* argv[]) {
 	std::string line;
 	while (std::getline(input, line))
 	{
-		
 		GrepResult res;
 		res.style = style;
-		ProssesLine(line, argv[2], res);
-		if (res.position != -1) {
-			std::cout << res.words << std::endl;
-			
+		
+		if (ProssesLine(line, argv[2], res)) {
+			if (style == short_phrase) {
+				for (const auto& word : res.words) {
+					std::cout << word << " ";
+				}
+				std::cout << std::endl;
+			}
+			else {
+				std::cout << res.whole_line << std::endl;
+			}
+		}
+		else {
+			std::cout << "No words found" << std::endl;
 		}
 	}
-
-	input.close();
 }
 
 
